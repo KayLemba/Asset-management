@@ -1,0 +1,320 @@
+/* =========================
+   GLOBAL
+========================= */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #eef1f6, #dfe6ee);
+  margin: 0;
+  color: #222;
+}
+
+body.dark {
+  background: linear-gradient(135deg, #0f2027, #1b2b34);
+  color: #eaeaea;
+}
+
+.container {
+  max-width: 1300px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* =========================
+   TOP BAR (GLASS)
+========================= */
+.top-bar {
+  display: flex;
+  gap: 28px; 
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  padding: 15px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+body.dark .top-bar {
+  background: rgba(30,30,30,0.6);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.search-input {
+  flex: 1;
+  max-width: 60%;
+}
+
+.search-input input {
+  width: 60%;
+}
+
+/* =========================
+   GLASS CARDS
+========================= */
+.card {
+  display: grid;
+  gap: 15px;
+  padding: 22px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow: 0 8px 28px rgba(0,0,0,.12);
+}
+
+body.dark .card {
+  background: rgba(25,25,25,0.75);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+
+/* =========================
+   FORM
+========================= */
+.asset-form h2 {
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.form-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px; 
+}
+
+/* =========================
+   INPUTS (GLASS)
+========================= */
+input, select {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+body.dark input,
+body.dark select {
+  background: rgba(40,40,40,0.8);
+  color: #fff;
+  border-color: rgba(255,255,255,0.2);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,.25);
+}
+
+/* =========================
+   TABLE (GLASS)
+========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+
+th {
+  background: rgba(255,255,255,0.7);
+  font-weight: 600;
+  color: #222;
+  backdrop-filter: blur(10px);
+}
+
+body.dark th {
+  background: rgba(45,45,45,0.8);
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+body.dark td {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+body.dark tbody tr:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+/* =========================
+   BUTTONS (GLASS)
+========================= */
+.btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+}
+
+/* Button colors */
+.green {
+  background: linear-gradient(135deg, #1e8e3e, #00c853);
+  color: #fff;
+}
+
+.blue {
+  background: linear-gradient(135deg, #1a73e8, #00b0ff);
+  color: #fff;
+}
+
+.red {
+  background: linear-gradient(135deg, #d93025, #ff5252);
+  color: #fff;
+}
+
+/* Ghost button */
+.ghost {
+  background: rgba(255,255,255,0.6);
+  color: #333;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+body.dark .ghost {
+  background: rgba(50,50,50,0.7);
+  color: #fff;
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* =========================
+   TABLE ACTION BUTTONS
+========================= */
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* =========================
+   TEXT
+========================= */
+.green-text {
+  color: #1e8e3e;
+  font-weight: 600;
+}
+
+.total {
+  margin-top: 18px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* =========================
+   MODAL (GLASS)
+========================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal .card {
+  width: 450px;
+}
+
+body.dark .modal .card {
+  background: rgba(30,30,30,0.85);
+}
+
+/* =========================
+   TOAST
+========================= */
+.toast {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  background: linear-gradient(135deg, #1e8e3e, #166f30);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  font-weight: 600;
+  animation: slideIn .10s ease;
+  z-index: 1000;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.top-logo {
+  max-height: 75px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  width: auto;
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  box-shadow: none;
+  mix-blend-mode: multiply;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .modal .card {
+    width: 90%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .table-actions {
+    gap: 12px;
+  }
+}
