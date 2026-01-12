@@ -31,23 +31,23 @@ Click here to view live version
 🛠 Built With
 Major Technologies
 
-React (JavaScript)
+- React (JavaScript)
 
-HTML5
+- HTML5
 
-CSS3
+- CSS3
 
 Libraries & Tools
 
-React Hooks
+- React Hooks
 
-LocalStorage API
+- LocalStorage
 
-XLSX (Excel Export)
+- XLSX (Excel Export)
 
-Git & GitHub
+- Git & GitHub
 
-Visual Studio Code
+- Visual Studio Code
 
 ⚙️ Getting Started
 
@@ -57,11 +57,11 @@ Follow these steps to run the project locally using Visual Studio Code.
 
 Make sure you have the following installed:
 
-Node.js (v16 or later recommended)
+- Node.js (v16 or later recommended)
 
-npm or yarn
+- npm or yarn
 
-Git
+- Git
 
 Visual Studio Code
 

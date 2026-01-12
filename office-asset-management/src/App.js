@@ -4,7 +4,7 @@ import AssetTable from "./components/AssetTable";
 import EditModal from "./components/EditModal";
 import Toast from "./components/Toast";
 import { exportToExcel } from "./utils/exportExcel";
-import logo from "./assets/logo.PNG";
+import logo from "./assets/logo.png";
 
 const CATEGORIES = [
   "Laptop",
@@ -67,7 +67,6 @@ function App() {
 
   return (
     <div className="container">
-     <img src={logo} alt="Logo" className="top-logo" />
       <h1>Office Asset Management</h1>
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
@@ -94,7 +93,7 @@ function App() {
         >
           Export Excel
         </button>
-
+        <img src={logo} alt="Logo" className="top-logo" />
       </div>
 
       <AssetForm onAdd={addAsset} categories={CATEGORIES} />

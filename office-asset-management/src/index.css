@@ -264,16 +264,15 @@ body.dark .modal .card {
 }
 
 .top-logo {
-  max-height: 75px;
+  max-height: 85px;
+  margin-left: 86px;
   border: none;
   outline: none;
   background-color: transparent;
   width: auto;
-  position: fixed;
   top: 10px;
   right: 20px;
   box-shadow: none;
-  mix-blend-mode: multiply;
 }
 
 /* =========================
