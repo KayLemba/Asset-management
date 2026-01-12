@@ -59,7 +59,7 @@ Make sure you have the following installed:
 
 - Node.js (v16 or later recommended)
 
-- npm or yarn
+- npm 
 
 - Git
 
@@ -67,7 +67,7 @@ Visual Studio Code
 
 🚀 Installation & Running the Project
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/stock-management.git
+git clone https://github.com/KayLemba/Asset-management.git
 
 2️⃣ Open the Project in VS Code
 cd stock-management
