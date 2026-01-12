@@ -67,7 +67,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Office Asset Management</h1>
+      <h1>📦Office Asset Management</h1>
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
