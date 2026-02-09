@@ -12,6 +12,7 @@ function AssetTable({ assets, onEdit, onDelete, totalValue }) {
             <th>Status</th>
             <th>Location</th>
             <th>Assigned To</th>
+            <th>Qty</th>
             <th>Value</th>
             <th>Actions</th>
           </tr>
@@ -26,8 +27,9 @@ function AssetTable({ assets, onEdit, onDelete, totalValue }) {
               <td>{asset.status}</td>
               <td>{asset.location}</td>
               <td>{asset.assignedTo}</td>
+              <td>{asset.quantity}</td>
               <td className="green-text">
-                ZMW {Number(asset.value).toLocaleString()}
+                ZMW {(asset.value * asset.quantity).toLocaleString()}
               </td>
               <td className="table-actions">
                 <button className="btn blue" onClick={() => onEdit(asset)}>

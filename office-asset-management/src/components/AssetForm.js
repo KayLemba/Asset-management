@@ -8,12 +8,14 @@ function AssetForm({ onAdd, categories }) {
     status: "",
     location: "",
     assignedTo: "",
-    value: ""
+    value: "",
+    quantity: 1
   });
 
   const submit = e => {
     e.preventDefault();
     if (!form.name || !form.category || !form.value) return;
+
     onAdd(form);
     setForm({
       name: "",
@@ -22,7 +24,8 @@ function AssetForm({ onAdd, categories }) {
       status: "",
       location: "",
       assignedTo: "",
-      value: ""
+      value: "",
+      quantity: 1
     });
   };
 
@@ -66,7 +69,18 @@ function AssetForm({ onAdd, categories }) {
           onChange={e => setForm({ ...form, assignedTo: e.target.value })}
         />
 
-        <input type="number"
+        <input
+          type="number"
+          min="1"
+          placeholder="Quantity"
+          value={form.quantity}
+          onChange={e =>
+            setForm({ ...form, quantity: Number(e.target.value) })
+          }
+        />
+
+        <input
+          type="number"
           placeholder="Asset Value (ZMW)"
           value={form.value}
           onChange={e => setForm({ ...form, value: e.target.value })}

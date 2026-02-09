@@ -7,25 +7,9 @@ import { exportToExcel } from "./utils/exportExcel";
 import logo from "./assets/logo.png";
 
 const CATEGORIES = [
-  "Laptop",
-  "Desktop",
-  "Monitor",
-  "Server",
-  "IP Phone",
-  "Headset",
-  "Keyboard",
-  "Mouse",
-  "Charger",
-  "Router",
-  "Switch",
-  "Printer",
-  "Scanner",
-  "UPS",
-  "Tablet",
-  "Projector",
-  "Camera",
-  "Docking Station",
-  "Other"
+  "Laptop","Desktop","Monitor","Server","IP Phone","Headset",
+  "Keyboard","Mouse","Charger","Router","Switch","Printer",
+  "Scanner","UPS","Tablet","Projector","Camera","Docking Station","Other"
 ];
 
 function App() {
@@ -45,7 +29,8 @@ function App() {
   );
 
   const totalValue = filteredAssets.reduce(
-    (sum, a) => sum + Number(a.value || 0),
+    (sum, a) =>
+      sum + Number(a.value || 0) * Number(a.quantity || 1),
     0
   );
 
@@ -67,18 +52,17 @@ function App() {
 
   return (
     <div className="container">
-      <h1>📦Office Asset Management</h1>
+      <img src={logo} alt="Logo" className="top-logo" />
+      <h1>📦 Office Asset Management</h1>
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
       <div className="top-bar">
-        <div className="search-input">
-          <input
-            placeholder="Search by asset name..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+        <input
+          placeholder="Search by asset name..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
 
         <button
           className="btn ghost"
@@ -93,7 +77,6 @@ function App() {
         >
           Export Excel
         </button>
-        <img src={logo} alt="Logo" className="top-logo" />
       </div>
 
       <AssetForm onAdd={addAsset} categories={CATEGORIES} />
