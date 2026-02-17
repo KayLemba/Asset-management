@@ -1,87 +1,125 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
-function EditModal({ asset, categories, onSave, onClose }) {
-  const [form, setForm] = useState({
-    ...asset,
-    quantity: asset.quantity ?? 1
-  });
+function EditModal({ asset, categories, statuses, onSave, onClose }) {
+  const [form, setForm] = useState(asset);
+  const [error, setError] = useState("");
 
-  const submit = e => {
+  useEffect(() => {
+    setForm(asset);
+    setError("");
+  }, [asset]);
+
+  const update = (key) => (e) => {
+    const value = e?.target?.value;
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const updateNumber = (key) => (e) => {
+    const raw = e?.target?.value;
+    const num = raw === "" ? "" : Number(raw);
+    setForm((prev) => ({ ...prev, [key]: num }));
+  };
+
+  const submit = (e) => {
     e.preventDefault();
-    onSave(form);
+    setError("");
+
+    const payload = {
+      ...form,
+      name: String(form.name ?? "").trim(),
+      serial: String(form.serial ?? "").trim(),
+      assignedTo: String(form.assignedTo ?? "").trim(),
+      location: String(form.location ?? "").trim(),
+      quantity: Math.max(1, Number(form.quantity || 1)),
+      value: Math.max(0, Number(form.value || 0)),
+    };
+
+    if (!payload.name || !payload.category) {
+      setError("Asset Name and Category are required.");
+      return;
+    }
+
+    onSave(payload);
   };
 
   return (
-    <div className="modal">
-      <form className="card" onSubmit={submit}>
-        <h2>Edit Asset</h2>
+    <div className="modal" role="dialog" aria-modal="true" aria-label="Edit asset">
+      <form className="card modal-card" onSubmit={submit}>
+        <div className="card-header">
+          <h2>Edit Asset</h2>
+          <p className="muted">Update the asset details then save your changes.</p>
+        </div>
 
-        <input
-          placeholder="Asset Name"
-          value={form.name}
-          onChange={e => setForm({ ...form, name: e.target.value })}
-        />
+        {error ? <div className="alert">{error}</div> : null}
 
-        <select
-          value={form.category}
-          onChange={e => setForm({ ...form, category: e.target.value })}
-        >
-          {categories.map(c => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
+        <div className="grid-2">
+          <div>
+            <label>Asset Name *</label>
+            <input value={form.name} onChange={update("name")} />
+          </div>
 
-        <input
-          placeholder="Serial Number"
-          value={form.serial}
-          onChange={e => setForm({ ...form, serial: e.target.value })}
-        />
+          <div>
+            <label>Category *</label>
+            <select value={form.category} onChange={update("category")}>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <input
-          placeholder="Status"
-          value={form.status}
-          onChange={e => setForm({ ...form, status: e.target.value })}
-        />
+          <div>
+            <label>Serial / Asset Tag</label>
+            <input value={form.serial || ""} onChange={update("serial")} />
+          </div>
 
-        <input
-          placeholder="Location"
-          value={form.location}
-          onChange={e => setForm({ ...form, location: e.target.value })}
-        />
+          <div>
+            <label>Status</label>
+            <select value={form.status || "In Use"} onChange={update("status")}>
+              {statuses.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <input
-          placeholder="Assigned To"
-          value={form.assignedTo}
-          onChange={e => setForm({ ...form, assignedTo: e.target.value })}
-        />
+          <div>
+            <label>Assigned To</label>
+            <input value={form.assignedTo || ""} onChange={update("assignedTo")} />
+          </div>
 
-        {/* ✅ QUANTITY FIELD */}
-        <input
-          type="number"
-          min="1"
-          placeholder="Quantity"
-          value={form.quantity}
-          onChange={e =>
-            setForm({ ...form, quantity: Number(e.target.value) })
-          }
-        />
+          <div>
+            <label>Location</label>
+            <input value={form.location || ""} onChange={update("location")} />
+          </div>
 
-        <input
-          type="number"
-          placeholder="Asset Value (ZMW)"
-          value={form.value}
-          onChange={e =>
-            setForm({ ...form, value: Number(e.target.value) })
-          }
-        />
+          <div>
+            <label>Quantity</label>
+            <input
+              type="number"
+              min="1"
+              value={form.quantity}
+              onChange={updateNumber("quantity")}
+            />
+          </div>
 
-        <div className="form-actions">
+          <div>
+            <label>Unit Value (ZMW)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.value}
+              onChange={updateNumber("value")}
+            />
+          </div>
+        </div>
+
+        <div className="modal-actions">
           <button className="btn green">Save</button>
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={onClose}
-          >
+          <button type="button" className="btn ghost" onClick={onClose}>
             Cancel
           </button>
         </div>
