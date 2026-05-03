@@ -1,56 +1,39 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import AssetForm from "./components/AssetForm";
 import AssetTable from "./components/AssetTable";
 import EditModal from "./components/EditModal";
 import Toast from "./components/Toast";
+import Dashboard from "./components/Dashboard";
+import HistoryModal from "./components/HistoryModal";
 import { exportToExcel } from "./utils/exportExcel";
 import logo from "./assets/logo.png";
 
-const CATEGORIES = [
-  "Laptop",
-  "CPU",
-  "Desktop",
-  "Workstation",
-  "Monitor",
-  "Server",
-  "NAS Storage",
-  "External Hard Drive",
-  "UPS",
-  "IP Phone",
-  "Headset",
-  "Keyboard",
-  "Mouse",
-  "Charger",
-  "Docking Station",
-  "Webcam",
-  "Printer",
-  "Scanner",
-  "Photocopier",
-  "Router",
-  "Switch",
-  "Firewall",
-  "Access Point",
-  "Modem",
-  "Projector",
-  "Camera",
-  "NVR",
-  "Tablet",
-  "Mobile Phone",
-  "Battery",
-  "Inverter",
-  "Other",
+export const CATEGORIES = [
+  "Laptop","CPU","Desktop","Workstation","Monitor","Server","NAS Storage",
+  "External Hard Drive","UPS","IP Phone","Headset","Keyboard","TV","Mouse",
+  "Charger","Docking Station","Webcam","Printer","Scanner","Photocopier",
+  "Router","Switch","Firewall","Access Point","Modem","Projector","Camera",
+  "NVR","Tablet","Mobile Phone","Battery","Inverter","Other",
 ];
 
-const STATUSES = ["In Use", "In Store", "Repair", "Retired", "Stolen", "Cant be fixed", "Fixed and ready for Use"];
+export const STATUSES = [
+  "In Use","In Storage","Repair","Retired","Lost","Cant be fixed","Fixed and ready for Use",
+];
 
 function safeParseJSON(value, fallback) {
   try {
     if (!value) return fallback;
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed : fallback;
-  } catch {
-    return fallback;
-  }
+  } catch { return fallback; }
+}
+
+function safeParseObj(value, fallback) {
+  try {
+    if (!value) return fallback;
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
+  } catch { return fallback; }
 }
 
 function normalizeAsset(a) {
@@ -62,6 +45,7 @@ function normalizeAsset(a) {
     status: String(a?.status ?? "In Use"),
     assignedTo: String(a?.assignedTo ?? "").trim(),
     location: String(a?.location ?? "").trim(),
+    comments: String(a?.comments ?? "").trim(),
     quantity: Number(a?.quantity ?? 1) || 1,
     value: Number(a?.value ?? 0) || 0,
     createdAt: a?.createdAt ?? new Date().toISOString(),
@@ -69,16 +53,20 @@ function normalizeAsset(a) {
   };
 }
 
-function App() {
-  const [assets, setAssets] = useState(() => {
-    const saved = safeParseJSON(localStorage.getItem("assets"), []);
-    return saved.map(normalizeAsset);
-  });
-
+export default function App() {
+  const [assets, setAssets] = useState(() =>
+    safeParseJSON(localStorage.getItem("assets"), []).map(normalizeAsset)
+  );
+  const [history, setHistory] = useState(() =>
+    safeParseObj(localStorage.getItem("assetHistory"), {})
+  );
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [editAsset, setEditAsset] = useState(null);
   const [toast, setToast] = useState(null);
+  const [historyAsset, setHistoryAsset] = useState(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
@@ -92,220 +80,170 @@ function App() {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  useEffect(() => {
-    localStorage.setItem("assets", JSON.stringify(assets));
-  }, [assets]);
+  useEffect(() => { localStorage.setItem("assets", JSON.stringify(assets)); }, [assets]);
+  useEffect(() => { localStorage.setItem("assetHistory", JSON.stringify(history)); }, [history]);
 
-  // Category counts (sum of quantities per category)
-  const categoryCounts = useMemo(() => {
-    const acc = {};
-    for (const a of assets) {
-      const cat = (a.category || "Other").trim() || "Other";
-      acc[cat] = (acc[cat] || 0) + Number(a.quantity ?? 1);
-    }
-    return acc;
-  }, [assets]);
+  const addHistoryEntry = useCallback((assetId, entries) => {
+    setHistory(prev => ({ ...prev, [assetId]: [...(prev[assetId] || []), ...entries] }));
+  }, []);
 
-  // Filter = category + search
   const filteredAssets = useMemo(() => {
     let list = assets;
-
-    if (selectedCategory !== "All") {
-      list = list.filter((a) => a.category === selectedCategory);
-    }
-
+    if (selectedCategory !== "All") list = list.filter(a => a.category === selectedCategory);
     const q = search.trim().toLowerCase();
     if (!q) return list;
-
-    return list.filter((a) => {
-      const haystack = [
-        a.name,
-        a.category,
-        a.serial,
-        a.status,
-        a.location,
-        a.assignedTo,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(q);
-    });
+    return list.filter(a =>
+      [a.name,a.category,a.serial,a.status,a.location,a.assignedTo,a.comments]
+        .filter(Boolean).join(" ").toLowerCase().includes(q)
+    );
   }, [assets, search, selectedCategory]);
 
-  // Totals reflect the current filter
-  const totalRecords = filteredAssets.length;
-  const totalDevices = filteredAssets.reduce(
-    (sum, a) => sum + Number(a.quantity ?? 1),
-    0
-  );
-  const totalValue = filteredAssets.reduce(
-    (sum, a) => sum + Number(a.value ?? 0) * Number(a.quantity ?? 1),
-    0
-  );
 
-  // Extra: category-specific record count (for the selected category)
-  const selectedCategoryRecords =
-    selectedCategory === "All"
-      ? assets.length
-      : assets.filter((a) => a.category === selectedCategory).length;
-
-  const selectedCategoryDevices =
-    selectedCategory === "All"
-      ? assets.reduce((s, a) => s + Number(a.quantity ?? 1), 0)
-      : categoryCounts[selectedCategory] || 0;
+  const totalValue   = filteredAssets.reduce((s,a)=>s+Number(a.value??0)*Number(a.quantity??1),0);
 
   const addAsset = (asset) => {
-    const normalized = normalizeAsset({
-      ...asset,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-
-    if (!normalized.name || !normalized.category) {
-      setToast("Please fill in Asset Name and Category.");
-      return;
-    }
-
-    setAssets((prev) => [normalized, ...prev]);
+    const normalized = normalizeAsset({ ...asset, id: Date.now(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    if (!normalized.name || !normalized.category) { setToast("Please fill in Asset Name and Category."); return; }
+    setAssets(prev => [normalized, ...prev]);
+    addHistoryEntry(normalized.id, [{ date: new Date().toISOString(), field: "Created", from: "—", to: normalized.status }]);
     setToast("Asset added successfully");
+    setActiveTab("assets");
   };
 
   const updateAsset = (asset) => {
-    const normalized = normalizeAsset({
-      ...asset,
-      updatedAt: new Date().toISOString(),
-    });
-
-    if (!normalized.name || !normalized.category) {
-      setToast("Asset Name and Category are required.");
-      return;
+    const normalized = normalizeAsset({ ...asset, updatedAt: new Date().toISOString() });
+    if (!normalized.name || !normalized.category) { setToast("Asset Name and Category are required."); return; }
+    const old = assets.find(a => a.id === normalized.id);
+    const changes = [];
+    if (old) {
+      for (const f of ["status","assignedTo","location","category","name","serial","quantity","value","comments"]) {
+        if (String(old[f]) !== String(normalized[f]))
+          changes.push({ date: new Date().toISOString(), field: f, from: String(old[f]||"—"), to: String(normalized[f]||"—") });
+      }
     }
-
-    setAssets((prev) =>
-      prev.map((a) => (a.id === normalized.id ? normalized : a))
-    );
+    setAssets(prev => prev.map(a => a.id === normalized.id ? normalized : a));
+    if (changes.length) addHistoryEntry(normalized.id, changes);
     setEditAsset(null);
     setToast("Asset updated successfully");
   };
 
   const deleteAsset = (id) => {
-    const ok = window.confirm("Delete this asset? This cannot be undone.");
-    if (!ok) return;
-
-    setAssets((prev) => prev.filter((a) => a.id !== id));
+    if (!window.confirm("Delete this asset? This cannot be undone.")) return;
+    setAssets(prev => prev.filter(a => a.id !== id));
+    setHistory(prev => { const n={...prev}; delete n[id]; return n; });
     setToast("Asset deleted");
   };
 
+  const NAV = [
+    { id:"dashboard", icon:"▦",  label:"Dashboard" },
+    { id:"assets",    icon:"☰",  label:"Asset Registry" },
+    { id:"add",       icon:"+",  label:"Add Asset" },
+  ];
+
   return (
-    <div className="container">
-      <img src={logo} alt="Logo" className="top-logo" />
-      <h1>💻 Office Asset Management</h1>
+    <div className={`app-shell${sidebarOpen ? " sidebar-expanded" : " sidebar-collapsed"}`}>
+
+      {/* ── SIDEBAR ── */}
+      <aside className="sidebar">
+        {/* Top: toggle button */}
+        <div className="sidebar-top">
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen(o => !o)}
+            title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <span className="toggle-bar"/><span className="toggle-bar"/><span className="toggle-bar"/>
+          </button>
+          {sidebarOpen && <span className="sidebar-app-name">IT Asset Manager</span>}
+        </div>
+
+        {/* Nav */}
+        <nav className="sidebar-nav">
+          {sidebarOpen && <div className="nav-section-label">Menu</div>}
+          {NAV.map(t => (
+            <button
+              key={t.id}
+              className={`nav-item${activeTab===t.id?" active":""}`}
+              onClick={() => setActiveTab(t.id)}
+              title={!sidebarOpen ? t.label : undefined}
+            >
+              <span className="nav-icon">{t.icon}</span>
+              {sidebarOpen && <span className="nav-label">{t.label}</span>}
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer: theme toggle */}
+        <div className="sidebar-footer">
+          <button className="theme-toggle" onClick={() => setDarkMode(d => !d)}>
+            <span className="nav-icon">{darkMode ? "☀️" : "🌙"}</span>
+            {sidebarOpen && <span className="nav-label">{darkMode ? "Light Mode" : "Dark Mode"}</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* ── MAIN ── */}
+      <main className="main-content">
+
+        {/* Header — logo lives here top-right */}
+        <header className="top-header">
+          <div className="header-left">
+            <h1 className="page-title">
+              {activeTab === "dashboard" && "Dashboard"}
+              {activeTab === "assets"    && "Asset Registry"}
+              {activeTab === "add"       && "Add New Asset"}
+            </h1>
+            <span className="page-sub">
+              {activeTab === "dashboard" && "Overview of your IT inventory"}
+              {activeTab === "assets"    && `${filteredAssets.length} record(s) · ZMW ${totalValue.toLocaleString()}`}
+              {activeTab === "add"       && "Register a new IT asset"}
+            </span>
+          </div>
+
+          {/* Controls + Logo */}
+          <div className="header-right">
+            {activeTab === "assets" && (
+              <>
+                <input
+                  className="search-input"
+                  placeholder="🔍  Search…"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <select className="cat-select" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+                  <option value="All">All Categories</option>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button className="hdr-btn green" onClick={() => exportToExcel(filteredAssets)}>⬇ Export</button>
+              </>
+            )}
+            {/* Logo — always top-right */}
+            <div className="header-logo-wrap">
+              <img src={logo} alt="Exponent Bizolution" className="header-logo" />
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="content-area">
+          {activeTab === "dashboard" && (
+            <Dashboard assets={assets} history={history} onNavigate={setActiveTab} />
+          )}
+          {activeTab === "assets" && (
+            <AssetTable
+              assets={filteredAssets}
+              onEdit={setEditAsset}
+              onDelete={deleteAsset}
+              onHistory={a => setHistoryAsset(a)}
+            />
+          )}
+          {activeTab === "add" && (
+            <AssetForm onAdd={addAsset} categories={CATEGORIES} statuses={STATUSES} />
+          )}
+        </div>
+      </main>
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
-
-      {/* Totals now match the selected category + search */}
-      <div className="dashboard-cards">
-        <div className="card summary">
-          <h3>
-            Total Records {selectedCategory !== "All" ? `(${selectedCategory})` : ""}
-          </h3>
-          <p>{totalRecords}</p>
-        </div>
-
-        <div className="card summary">
-          <h3>
-            Total Devices {selectedCategory !== "All" ? `(${selectedCategory})` : ""}
-          </h3>
-          <p>{totalDevices}</p>
-        </div>
-
-        <div className="card summary">
-          <h3>
-            Total Asset Value {selectedCategory !== "All" ? `(${selectedCategory})` : ""}
-          </h3>
-          <p>ZMW {totalValue.toLocaleString()}</p>
-        </div>
-      </div>
-
-      {/* ✅ NEW PROFESSIONAL CATEGORY SELECTOR (replaces tiles) */}
-      <div className="card">
-        <div className="category-header">
-          <h2>Category Filter</h2>
-
-          <div className="category-controls">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Select category"
-            >
-              <option value="All">All Categories</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-
-            <button
-              className="btn ghost"
-              onClick={() => setSelectedCategory("All")}
-              disabled={selectedCategory === "All"}
-              title="Clear category filter"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <div className="category-selected">
-          <div>
-            <div className="muted">Selected Category</div>
-            <div className="selected-title">
-              {selectedCategory === "All" ? "All Categories" : selectedCategory}
-            </div>
-          </div>
-
-          <div className="selected-metrics">
-            <div className="metric">
-              <span className="muted">Devices</span>
-              <strong>{selectedCategoryDevices}</strong>
-            </div>
-
-            <div className="metric">
-              <span className="muted">Records</span>
-              <strong>{selectedCategoryRecords}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="top-bar">
-        <input
-          placeholder="Search (name, serial, status, location...)"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <button
-          className="btn ghost"
-          onClick={() => setDarkMode((d) => !d)}
-          aria-pressed={darkMode}
-          title="Toggle dark mode"
-        >
-          {darkMode ? "☀️ Light" : "🌙 Dark"}
-        </button>
-
-        <button className="btn green" onClick={() => exportToExcel(filteredAssets)}>
-          Export Excel
-        </button>
-      </div>
-
-      <AssetForm onAdd={addAsset} categories={CATEGORIES} statuses={STATUSES} />
-
-      <AssetTable assets={filteredAssets} onEdit={setEditAsset} onDelete={deleteAsset} />
 
       {editAsset && (
         <EditModal
@@ -316,8 +254,14 @@ function App() {
           onClose={() => setEditAsset(null)}
         />
       )}
+
+      {historyAsset && (
+        <HistoryModal
+          asset={historyAsset}
+          history={history[historyAsset.id] || []}
+          onClose={() => setHistoryAsset(null)}
+        />
+      )}
     </div>
   );
 }
-
-export default App;
