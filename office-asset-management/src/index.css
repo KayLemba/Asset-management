@@ -250,6 +250,9 @@ body { font-family: var(--font-b); background: var(--bg); color: var(--text); }
   transition: margin-left var(--sb-dur) var(--sb-ease);
 }
 
+.top-logo { height: 30px; 
+}
+
 /* ── Header ── */
 .top-header {
   background: var(--card);
