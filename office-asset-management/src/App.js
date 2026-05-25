@@ -98,7 +98,6 @@ export default function App() {
     );
   }, [assets, search, selectedCategory]);
 
-
   const totalValue   = filteredAssets.reduce((s,a)=>s+Number(a.value??0)*Number(a.quantity??1),0);
 
   const addAsset = (asset) => {

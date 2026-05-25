@@ -352,8 +352,9 @@ body.dark .header-logo-wrap {
 }
 
 .header-logo {
+  height: 28px;
   width: auto;
-  max-width: 100px;
+  max-width: 130px;
   object-fit: contain;
   display: block;
 }
