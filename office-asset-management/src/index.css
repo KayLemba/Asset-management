@@ -250,9 +250,6 @@ body { font-family: var(--font-b); background: var(--bg); color: var(--text); }
   transition: margin-left var(--sb-dur) var(--sb-ease);
 }
 
-.top-logo { height: 30px; 
-}
-
 /* ── Header ── */
 .top-header {
   background: var(--card);
@@ -338,28 +335,31 @@ body.dark .cat-select { background: rgba(255,255,255,0.05); }
 
 /* Logo in header top-right */
 .header-logo-wrap {
-  background: #ffffff;
-  border: 1px solid rgba(15,23,42,0.10);
-  border-radius: 8px;
-  padding: 5px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 40px;
   flex-shrink: 0;
+  padding: 0 4px;
 }
 
-body.dark .header-logo-wrap {
-  border-color: rgba(255,255,255,0.12);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
-}
-
+/* Light mode: invert flips white text→black and black bg→white,
+   then multiply blends the white bg away — result: black text, no background */
 .header-logo {
-  height: 28px;
+  height: 32px;
   width: auto;
-  max-width: 130px;
+  max-width: 140px;
   object-fit: contain;
   display: block;
+  filter: invert(1);
+  mix-blend-mode: multiply;
+  transition: filter 0.2s;
+}
+
+/* Dark mode: original logo — white text on black bg blends into dark header */
+body.dark .header-logo {
+  filter: none;
+  mix-blend-mode: normal;
 }
 
 /* ── Scrollable area ── */

@@ -6,7 +6,7 @@ import Toast from "./components/Toast";
 import Dashboard from "./components/Dashboard";
 import HistoryModal from "./components/HistoryModal";
 import { exportToExcel } from "./utils/exportExcel";
-import logo from "./assets/logo.png";
+import logo from "./assets/exponent-logo.png";
 
 export const CATEGORIES = [
   "Laptop","CPU","Desktop","Workstation","Monitor","Server","NAS Storage",
