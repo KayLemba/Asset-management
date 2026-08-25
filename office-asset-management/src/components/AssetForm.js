@@ -8,6 +8,7 @@ const DEFAULT_FORM = {
   assignedTo: "",
   location: "",
   quantity: 1,
+  minQuantity: 0,
   value: 0,
 };
 
@@ -41,6 +42,7 @@ function AssetForm({ onAdd, categories, statuses }) {
       assignedTo: form.assignedTo.trim(),
       location: form.location.trim(),
       quantity: Math.max(1, Number(form.quantity || 1)),
+      minQuantity: Math.max(0, Number(form.minQuantity || 0)),
       value: Math.max(0, Number(form.value || 0)),
     };
 
@@ -133,6 +135,16 @@ function AssetForm({ onAdd, categories, statuses }) {
             min="1"
             value={form.quantity}
             onChange={updateNumber("quantity")}
+          />
+        </div>
+
+        <div>
+          <label>Minimum Stock Level</label>
+          <input
+            type="number"
+            min="0"
+            value={form.minQuantity}
+            onChange={updateNumber("minQuantity")}
           />
         </div>
 

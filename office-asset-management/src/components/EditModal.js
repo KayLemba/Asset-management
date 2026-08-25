@@ -15,6 +15,7 @@ export default function EditModal({ asset, categories, statuses, onSave, onClose
       ...form, name:String(form.name??"").trim(), serial:String(form.serial??"").trim(),
       assignedTo:String(form.assignedTo??"").trim(), location:String(form.location??"").trim(),
       comments:String(form.comments??"").trim(), quantity:Math.max(1,Number(form.quantity||1)),
+      minQuantity:Math.max(0,Number(form.minQuantity||0)),
       value:Math.max(0,Number(form.value||0)),
     };
     if (!payload.name||!payload.category) { setError("Asset Name and Category are required."); return; }
@@ -46,6 +47,7 @@ export default function EditModal({ asset, categories, statuses, onSave, onClose
           <div><label>Location</label><input value={form.location||""} onChange={update("location")}/></div>
           <div><label>Comments</label><input value={form.comments||""} onChange={update("comments")}/></div>
           <div><label>Quantity</label><input type="number" min="1" value={form.quantity} onChange={updateNumber("quantity")}/></div>
+          <div><label>Minimum Stock Level</label><input type="number" min="0" value={form.minQuantity||0} onChange={updateNumber("minQuantity")}/></div>
           <div><label>Unit Value (ZMW)</label><input type="number" min="0" step="0.01" value={form.value} onChange={updateNumber("value")}/></div>
         </div>
         <div className="modal-actions">

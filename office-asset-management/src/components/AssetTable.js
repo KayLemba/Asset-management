@@ -24,7 +24,7 @@ function trunc(str, len = 16) {
   return str.length > len ? str.slice(0, len) + "…" : str;
 }
 
-export default function AssetTable({ assets, onEdit, onDelete, onHistory }) {
+export default function AssetTable({ assets, onEdit, onDelete, onHistory, canWrite = true }) {
   return (
     <div className="table-card">
       <table className="asset-table">
@@ -67,9 +67,9 @@ export default function AssetTable({ assets, onEdit, onDelete, onHistory }) {
                 <td className="col-val">{fmtMoney(total)}</td>
                 <td className="col-comment" title={asset.comments || ""}>{trunc(asset.comments, 14) || "—"}</td>
                 <td className="col-actions">
-                  <button className="tbl-btn blue"  onClick={() => onEdit(asset)}>Edit</button>
                   <button className="tbl-btn ghost" onClick={() => onHistory(asset)} title="View history">🕐</button>
-                  <button className="tbl-btn red"   onClick={() => onDelete(asset.id)}>Del</button>
+                  {canWrite && <button className="tbl-btn blue" onClick={() => onEdit(asset)}>Edit</button>}
+                  {canWrite && <button className="tbl-btn red" onClick={() => onDelete(asset.id)}>Del</button>}
                 </td>
               </tr>
             );

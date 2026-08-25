@@ -147,11 +147,12 @@ body { font-family: var(--font-b); background: var(--bg); color: var(--text); }
 /* ── Nav ── */
 .sidebar-nav {
   flex: 1;
+  min-height: 0;       /* allow this to actually shrink instead of pushing the footer off-screen */
   padding: 10px 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow: hidden;
+  overflow-y: auto;    /* scroll the nav itself if it's ever taller than available space */
 }
 
 .nav-section-label {
@@ -200,6 +201,9 @@ body { font-family: var(--font-b); background: var(--bg); color: var(--text); }
   padding: 10px 8px;
   border-top: 1px solid var(--sb-border);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .theme-toggle {
@@ -326,6 +330,56 @@ body.dark .cat-select { background: rgba(255,255,255,0.05); }
   object-fit: contain;
   flex-shrink: 0;
   margin-left: 12px;
+}
+
+/* =====================================================
+   AUTH
+===================================================== */
+.auth-shell {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.auth-card { width: 100%; max-width: 380px; }
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+/* =====================================================
+   SIDEBAR USER INFO
+===================================================== */
+.user-info {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--sb-border);
+  margin-bottom: 8px;
+}
+
+.user-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sb-txt);
+  margin-top: 2px;
 }
 
 /* ── Scrollable area ── */
