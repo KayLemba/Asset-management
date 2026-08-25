@@ -19,6 +19,19 @@ const CAT_ICONS = {
   Inverter:"⚡", Firewall:"🛡", Webcam:"📸", Scanner:"🖨",
   Photocopier:"📠", TV:"📺", NVR:"📹", Modem:"📶",
   "Access Point":"📡", Charger:"🔌", "Docking Station":"🔌", Other:"📦",
+
+  // Tools
+  Drill:"🛠️", Grinder:"⚙️", Probe:"🔎", Multimeter:"📟", "Soldering Iron":"🔥",
+  "Screwdriver Set":"🪛", "Crimping Tool":"🔧", "Cable Tester":"🧪", "Power Tool":"🔩",
+
+  // Networking
+  "LAN Cable":"🔌", "Fiber Optic Cable":"📶", "Patch Panel":"🧩",
+  "Network Rack":"🗄️", "PoE Injector":"⚡",
+
+  // Fuel Automation
+  "Fuel Dispenser":"⛽", "Fuel Level Probe":"🛢️", "ATG (Automatic Tank Gauge)":"📊",
+  "Fuel Flow Meter":"📈", "Fuel Pump Controller":"🕹️", "Solenoid Valve":"🚰",
+  "Fuel Management System":"🗃️", "Tank Sensor":"🎚️",
 };
 
 function StatCard({ label, value, sub, accent }) {

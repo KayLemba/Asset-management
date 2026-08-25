@@ -6,14 +6,28 @@ import Toast from "./components/Toast";
 import Dashboard from "./components/Dashboard";
 import HistoryModal from "./components/HistoryModal";
 import { exportToExcel } from "./utils/exportExcel";
-import logo from "./assets/exponent-logo.png";
+import logo from "./assets/tactivo-logo.png";
 
 export const CATEGORIES = [
   "Laptop","CPU","Desktop","Workstation","Monitor","Server","NAS Storage",
   "External Hard Drive","UPS","IP Phone","Headset","Keyboard","TV","Mouse",
   "Charger","Docking Station","Webcam","Printer","Scanner","Photocopier",
   "Router","Switch","Firewall","Access Point","Modem","Projector","Camera",
-  "NVR","Tablet","Mobile Phone","Battery","Inverter","Other",
+  "NVR","Tablet","Mobile Phone","Battery","Inverter",
+
+  // Tools
+  "Drill","Grinder","Probe","Multimeter","Soldering Iron","Screwdriver Set",
+  "Crimping Tool","Cable Tester","Power Tool",
+
+  // Networking
+  "LAN Cable","Fiber Optic Cable","Patch Panel","Network Rack","PoE Injector",
+
+  // Fuel Automation
+  "Fuel Dispenser","Fuel Level Probe","ATG (Automatic Tank Gauge)",
+  "Fuel Flow Meter","Fuel Pump Controller","Solenoid Valve",
+  "Fuel Management System","Tank Sensor",
+
+  "Other",
 ];
 
 export const STATUSES = [
@@ -144,7 +158,7 @@ export default function App() {
 
       {/* ── SIDEBAR ── */}
       <aside className="sidebar">
-        {/* Top: toggle button */}
+        {/* Top: toggle */}
         <div className="sidebar-top">
           <button
             className="sidebar-toggle"
@@ -153,7 +167,6 @@ export default function App() {
           >
             <span className="toggle-bar"/><span className="toggle-bar"/><span className="toggle-bar"/>
           </button>
-          {sidebarOpen && <span className="sidebar-app-name">IT Asset Manager</span>}
         </div>
 
         {/* Nav */}
@@ -184,7 +197,7 @@ export default function App() {
       {/* ── MAIN ── */}
       <main className="main-content">
 
-        {/* Header — logo lives here top-right */}
+        {/* Header */}
         <header className="top-header">
           <div className="header-left">
             <h1 className="page-title">
@@ -199,7 +212,7 @@ export default function App() {
             </span>
           </div>
 
-          {/* Controls + Logo */}
+          {/* Controls */}
           <div className="header-right">
             {activeTab === "assets" && (
               <>
@@ -216,11 +229,9 @@ export default function App() {
                 <button className="hdr-btn green" onClick={() => exportToExcel(filteredAssets)}>⬇ Export</button>
               </>
             )}
-            {/* Logo — always top-right */}
-            <div className="header-logo-wrap">
-              <img src={logo} alt="Exponent Bizolution" className="header-logo" />
-            </div>
           </div>
+
+          <img src={logo} alt="Tactivo Technologies" className="header-logo" />
         </header>
 
         {/* Content */}
