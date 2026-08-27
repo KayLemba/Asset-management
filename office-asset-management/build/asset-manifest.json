@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.ed332abf.css",
+    "main.js": "/static/js/main.1a0383a8.js",
+    "static/media/tactivo-mark.png": "/static/media/tactivo-mark.dbf7056f245c17da78b0.png",
+    "index.html": "/index.html",
+    "main.ed332abf.css.map": "/static/css/main.ed332abf.css.map",
+    "main.1a0383a8.js.map": "/static/js/main.1a0383a8.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ed332abf.css",
+    "static/js/main.1a0383a8.js"
+  ]
+}
