@@ -1,18 +1,25 @@
 import { useMemo, useState } from "react";
+import TableScroll from "./TableScroll";
 
 const TYPE_LABEL = {
   low_stock: "Low Stock",
   deadstock: "Deadstock",
   requirement: "Requirement",
+  warranty_expiring: "Warranty Expiring",
+  warranty_expired: "Warranty Expired",
+  overdue_checkout: "Overdue Checkout",
 };
 
 const TYPE_CLASS = {
   low_stock: "warn",
   deadstock: "muted",
   requirement: "info",
+  warranty_expiring: "warn",
+  warranty_expired: "danger",
+  overdue_checkout: "danger",
 };
 
-export default function AlertsPanel({ alerts, onMarkRead, onRunDeadstockCheck }) {
+export default function AlertsPanel({ alerts, onMarkRead, onRunChecks }) {
   const [filter, setFilter] = useState("unread");
 
   const visible = useMemo(() => {
@@ -27,11 +34,11 @@ export default function AlertsPanel({ alerts, onMarkRead, onRunDeadstockCheck })
         <div className="card-header row">
           <div>
             <h2>Alerts</h2>
-            <p className="muted">Low stock, deadstock, and new inventory requests.</p>
+            <p className="muted">Low stock, deadstock, warranty, overdue checkout, and inventory request alerts.</p>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <button className="btn ghost" onClick={onRunDeadstockCheck} title="Scan assets for 90+ days without stock movement">
-              Run Deadstock Scan
+            <button className="btn ghost" onClick={onRunChecks} title="Scan assets for deadstock, warranty expiry, and overdue checkouts">
+              Run Alert Scan
             </button>
             <select className="cat-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
               <option value="unread">Unread</option>
@@ -42,7 +49,7 @@ export default function AlertsPanel({ alerts, onMarkRead, onRunDeadstockCheck })
         </div>
       </div>
 
-      <div className="table-card">
+      <TableScroll minWidth="820px" className="alerts-table-scroll">
         <table className="asset-table">
           <thead>
             <tr>
@@ -69,7 +76,7 @@ export default function AlertsPanel({ alerts, onMarkRead, onRunDeadstockCheck })
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </div>
   );
 }

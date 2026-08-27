@@ -6,17 +6,23 @@ export default function EditModal({ asset, categories, statuses, onSave, onClose
 
   useEffect(()=>{ setForm(asset); setError(""); },[asset]);
 
-  const update       = key => e => setForm(p=>({...p,[key]:e?.target?.value}));
+  const update       = key => e => {
+    let value = e?.target?.value;
+    if (key === "assetId") value = value.replace(/[^1-9]/g, "").slice(0, 1);
+    setForm(p=>({...p,[key]:value}));
+  };
   const updateNumber = key => e => { const r=e?.target?.value; setForm(p=>({...p,[key]:r===""?"":Number(r)})); };
 
   const submit = e => {
     e.preventDefault(); setError("");
     const payload = {
-      ...form, name:String(form.name??"").trim(), serial:String(form.serial??"").trim(),
+      ...form, assetId:String(form.assetId??"").trim(), name:String(form.name??"").trim(), serial:String(form.serial??"").trim(),
       assignedTo:String(form.assignedTo??"").trim(), location:String(form.location??"").trim(),
       comments:String(form.comments??"").trim(), quantity:Math.max(1,Number(form.quantity||1)),
       minQuantity:Math.max(0,Number(form.minQuantity||0)),
       value:Math.max(0,Number(form.value||0)),
+      purchaseDate: form.purchaseDate || "",
+      warrantyExpiry: form.warrantyExpiry || "",
     };
     if (!payload.name||!payload.category) { setError("Asset Name and Category are required."); return; }
     onSave(payload);
@@ -30,7 +36,8 @@ export default function EditModal({ asset, categories, statuses, onSave, onClose
           <p className="muted">Update asset details then save your changes.</p>
         </div>
         {error && <div className="alert">{error}</div>}
-        <div className="grid-2">
+                <div className="grid-2">
+          <div><label>Asset ID (1 digit)</label><input type="text" inputMode="numeric" pattern="[1-9]" maxLength="1" placeholder="e.g., 1" value={form.assetId||""} onChange={update("assetId")}/></div>
           <div><label>Asset Name *</label><input value={form.name} onChange={update("name")}/></div>
           <div><label>Category *</label>
             <select value={form.category} onChange={update("category")}>
@@ -49,6 +56,8 @@ export default function EditModal({ asset, categories, statuses, onSave, onClose
           <div><label>Quantity</label><input type="number" min="1" value={form.quantity} onChange={updateNumber("quantity")}/></div>
           <div><label>Minimum Stock Level</label><input type="number" min="0" value={form.minQuantity||0} onChange={updateNumber("minQuantity")}/></div>
           <div><label>Unit Value (ZMW)</label><input type="number" min="0" step="0.01" value={form.value} onChange={updateNumber("value")}/></div>
+          <div><label>Purchase Date</label><input type="date" value={form.purchaseDate||""} onChange={update("purchaseDate")}/></div>
+          <div><label>Warranty Expiry</label><input type="date" value={form.warrantyExpiry||""} onChange={update("warrantyExpiry")}/></div>
         </div>
         <div className="modal-actions">
           <button className="btn green">Save Changes</button>

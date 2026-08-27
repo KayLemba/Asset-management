@@ -1,5 +1,9 @@
 import { useMemo } from "react";
 
+import ValueTrendChart from "./ValueTrendChart";
+import Icon from "./Icon";
+import { buildValueTrend } from "../utils/valueTrend";
+
 const STATUS_COLORS = {
   "In Use":               "#22c55e",
   "In Storage":           "#60a5fa",
@@ -11,27 +15,21 @@ const STATUS_COLORS = {
 };
 
 const CAT_ICONS = {
-  Laptop:"💻", CPU:"🖥", Desktop:"🖥", Workstation:"🖥", Monitor:"🖥",
-  Server:"🖧", Printer:"🖨", Router:"📡", Switch:"🔀", Tablet:"📱",
-  "Mobile Phone":"📱", Camera:"📷", Projector:"📽", UPS:"🔋",
-  "IP Phone":"☎️", Headset:"🎧", Keyboard:"⌨️", Mouse:"🖱",
-  "NAS Storage":"💾", "External Hard Drive":"💾", Battery:"🔋",
-  Inverter:"⚡", Firewall:"🛡", Webcam:"📸", Scanner:"🖨",
-  Photocopier:"📠", TV:"📺", NVR:"📹", Modem:"📶",
-  "Access Point":"📡", Charger:"🔌", "Docking Station":"🔌", Other:"📦",
-
-  // Tools
-  Drill:"🛠️", Grinder:"⚙️", Probe:"🔎", Multimeter:"📟", "Soldering Iron":"🔥",
-  "Screwdriver Set":"🪛", "Crimping Tool":"🔧", "Cable Tester":"🧪", "Power Tool":"🔩",
-
-  // Networking
-  "LAN Cable":"🔌", "Fiber Optic Cable":"📶", "Patch Panel":"🧩",
-  "Network Rack":"🗄️", "PoE Injector":"⚡",
-
-  // Fuel Automation
-  "Fuel Dispenser":"⛽", "Fuel Level Probe":"🛢️", "ATG (Automatic Tank Gauge)":"📊",
-  "Fuel Flow Meter":"📈", "Fuel Pump Controller":"🕹️", "Solenoid Valve":"🚰",
-  "Fuel Management System":"🗃️", "Tank Sensor":"🎚️",
+  Laptop: "laptop", CPU: "monitor", Desktop: "monitor", Workstation: "monitor", Monitor: "monitor",
+  Server: "server", Printer: "printer", Router: "network", Switch: "network", Tablet: "phone",
+  "Mobile Phone": "phone", Camera: "camera", Projector: "projector", UPS: "battery",
+  "IP Phone": "phone", Headset: "phone", Keyboard: "laptop", Mouse: "laptop",
+  "NAS Storage": "storage", "External Hard Drive": "storage", Battery: "battery",
+  Inverter: "power", Firewall: "shield", Webcam: "camera", Scanner: "printer",
+  Photocopier: "printer", TV: "monitor", NVR: "storage", Modem: "network",
+  "Access Point": "network", Charger: "power", "Docking Station": "laptop", Other: "box",
+  Drill: "tools", Grinder: "tools", Probe: "search", Multimeter: "tools", "Soldering Iron": "tools",
+  "Screwdriver Set": "tools", "Crimping Tool": "tools", "Cable Tester": "tools", "Power Tool": "tools",
+  "LAN Cable": "network", "Fiber Optic Cable": "network", "Patch Panel": "network",
+  "Network Rack": "server", "PoE Injector": "power",
+  "Fuel Dispenser": "power", "Fuel Level Probe": "search", "ATG (Automatic Tank Gauge)": "chart",
+  "Fuel Flow Meter": "chart", "Fuel Pump Controller": "tools", "Solenoid Valve": "tools",
+  "Fuel Management System": "storage", "Tank Sensor": "search",
 };
 
 function StatCard({ label, value, sub, accent }) {
@@ -81,11 +79,11 @@ function DonutChart({ segments, size=120 }) {
   );
 }
 
-function BarRow({ label, value, max, color }) {
+function BarRow({ icon, label, value, max, color }) {
   const pct = max > 0 ? (value / max) * 100 : 0;
   return (
     <div className="bar-row">
-      <span className="bar-label">{label}</span>
+      <span className="bar-label"><Icon name={icon} size={14} /><span>{label}</span></span>
       <div className="bar-track">
         <div className="bar-fill" style={{width:`${pct}%`, background:color}}/>
       </div>
@@ -120,6 +118,7 @@ export default function Dashboard({ assets, history, onNavigate }) {
   },[assets]);
 
   const maxCat = byCategory[0]?.[1] || 1;
+  const valueTrend = useMemo(() => buildValueTrend(assets, history, 12), [assets, history]);
 
   // Recent activity from history
   const recentActivity = useMemo(()=>{
@@ -153,6 +152,11 @@ export default function Dashboard({ assets, history, onNavigate }) {
       </div>
 
       <div className="dash-grid">
+        <div className="dash-card trend-card" style={{ gridColumn: "1 / -1" }}>
+          <div className="dash-card-header">Portfolio Value Trend (12mo)</div>
+          <ValueTrendChart points={valueTrend} />
+        </div>
+
         {/* Status donut */}
         <div className="dash-card">
           <div className="dash-card-header">Status Overview</div>
@@ -176,7 +180,7 @@ export default function Dashboard({ assets, history, onNavigate }) {
           <div className="dash-card-header">Top Categories</div>
           <div className="bars-wrap">
             {byCategory.map(([cat,val],i)=>(
-              <BarRow key={cat} label={`${CAT_ICONS[cat]||"📦"} ${cat}`} value={val} max={maxCat}
+              <BarRow key={cat} icon={CAT_ICONS[cat] || "box"} label={cat} value={val} max={maxCat}
                 color={`hsl(${(i*37)%360},70%,55%)`}/>
             ))}
             {byCategory.length===0 && <p className="empty-hint">No data yet</p>}
@@ -200,7 +204,7 @@ export default function Dashboard({ assets, history, onNavigate }) {
                     </div>
                     <div className="activity-change">
                       <span className="from-badge">{e.from}</span>
-                      <span className="arrow">→</span>
+                      <span className="arrow"><Icon name="arrowRight" size={13} /></span>
                       <span className="to-badge">{e.to}</span>
                     </div>
                     <div className="activity-date">{new Date(e.date).toLocaleString()}</div>
@@ -216,11 +220,11 @@ export default function Dashboard({ assets, history, onNavigate }) {
           <div className="dash-card-header">Quick Actions</div>
           <div className="quick-actions">
             <button className="quick-btn" onClick={()=>onNavigate("add")}>
-              <span className="quick-icon">➕</span>
+              <span className="quick-icon"><Icon name="plus" size={20} /></span>
               <span>Add Asset</span>
             </button>
             <button className="quick-btn" onClick={()=>onNavigate("assets")}>
-              <span className="quick-icon">📋</span>
+              <span className="quick-icon"><Icon name="list" size={20} /></span>
               <span>View All Assets</span>
             </button>
           </div>
@@ -236,7 +240,7 @@ export default function Dashboard({ assets, history, onNavigate }) {
               return acc;
             },[]).sort((a,b)=>b.val-a.val).slice(0,5).map(({cat,val})=>(
               <div key={cat} className="value-row">
-                <span>{CAT_ICONS[cat]||"📦"} {cat}</span>
+                <span className="value-label"><Icon name={CAT_ICONS[cat] || "box"} size={14} /> {cat}</span>
                 <strong>ZMW {val.toLocaleString()}</strong>
               </div>
             ))}

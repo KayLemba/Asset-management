@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import TableScroll from "./TableScroll";
 
 export default function StockMovements({ assets, movements, onRecordMovement }) {
   const [assetId, setAssetId] = useState("");
@@ -89,7 +90,7 @@ export default function StockMovements({ assets, movements, onRecordMovement }) 
         </div>
       </form>
 
-      <div className="table-card">
+      <TableScroll minWidth="900px" className="stock-table-scroll">
         <table className="asset-table">
           <thead>
             <tr>
@@ -118,7 +119,7 @@ export default function StockMovements({ assets, movements, onRecordMovement }) 
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </div>
   );
 }

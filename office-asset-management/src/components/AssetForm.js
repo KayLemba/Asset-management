@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 const DEFAULT_FORM = {
+  assetId: "",
   name: "",
   category: "",
   serial: "",
@@ -10,6 +11,8 @@ const DEFAULT_FORM = {
   quantity: 1,
   minQuantity: 0,
   value: 0,
+  purchaseDate: "",
+  warrantyExpiry: "",
 };
 
 function AssetForm({ onAdd, categories, statuses }) {
@@ -21,7 +24,8 @@ function AssetForm({ onAdd, categories, statuses }) {
   }, [form.name, form.category]);
 
   const update = (key) => (e) => {
-    const value = e?.target?.value;
+    let value = e?.target?.value;
+    if (key === "assetId") value = value.replace(/[^1-9]/g, "").slice(0, 1);
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -37,6 +41,7 @@ function AssetForm({ onAdd, categories, statuses }) {
 
     const payload = {
       ...form,
+      assetId: form.assetId.trim(),
       name: form.name.trim(),
       serial: form.serial.trim(),
       assignedTo: form.assignedTo.trim(),
@@ -44,6 +49,8 @@ function AssetForm({ onAdd, categories, statuses }) {
       quantity: Math.max(1, Number(form.quantity || 1)),
       minQuantity: Math.max(0, Number(form.minQuantity || 0)),
       value: Math.max(0, Number(form.value || 0)),
+      purchaseDate: form.purchaseDate || "",
+      warrantyExpiry: form.warrantyExpiry || "",
     };
 
     if (!payload.name || !payload.category) {
@@ -65,6 +72,20 @@ function AssetForm({ onAdd, categories, statuses }) {
       {error ? <div className="alert">{error}</div> : null}
 
       <div className="grid-2">
+        <div>
+          <label>Asset ID (1 digit, optional)</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[1-9]"
+            maxLength="1"
+            placeholder="e.g., 1"
+            value={form.assetId}
+            onChange={update("assetId")}
+            autoComplete="off"
+          />
+        </div>
+
         <div>
           <label>Asset Name *</label>
           <input
@@ -157,6 +178,16 @@ function AssetForm({ onAdd, categories, statuses }) {
             value={form.value}
             onChange={updateNumber("value")}
           />
+        </div>
+
+        <div>
+          <label>Purchase Date</label>
+          <input type="date" value={form.purchaseDate} onChange={update("purchaseDate")} />
+        </div>
+
+        <div>
+          <label>Warranty Expiry</label>
+          <input type="date" value={form.warrantyExpiry} onChange={update("warrantyExpiry")} />
         </div>
       </div>
 

@@ -1,4 +1,7 @@
+import Icon from "./Icon";
+
 const FIELD_LABELS = {
+  assetId:   "Asset ID",
   status:     "Status",
   assignedTo: "Assigned To",
   location:   "Location",
@@ -7,8 +10,15 @@ const FIELD_LABELS = {
   serial:     "Serial / Tag",
   quantity:   "Quantity",
   value:      "Unit Value",
-  comments:   "Comments",
-  Created:    "Created",
+  comments:       "Comments",
+  purchaseDate:   "Purchase Date",
+  warrantyExpiry: "Warranty Expiry",
+  checkedOutAt:   "Checked Out",
+  dueBack:        "Due Back",
+  Created:        "Created",
+  Deleted:        "Deleted",
+  Restored:       "Restored",
+  Imported:       "Imported",
 };
 
 export default function HistoryModal({ asset, history, onClose }) {
@@ -22,7 +32,7 @@ export default function HistoryModal({ asset, history, onClose }) {
             <h2>Device History</h2>
             <p className="muted">{asset.name} · {asset.serial || "No serial"}</p>
           </div>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose} aria-label="Close history"><Icon name="close" size={15} /></button>
         </div>
 
         {sorted.length === 0 ? (
@@ -39,7 +49,7 @@ export default function HistoryModal({ asset, history, onClose }) {
                   <div className="history-field">{FIELD_LABELS[e.field]||e.field}</div>
                   <div className="history-change">
                     <span className="from-badge">{e.from}</span>
-                    <span className="arrow">→</span>
+                    <span className="arrow"><Icon name="arrowRight" size={13} /></span>
                     <span className="to-badge">{e.to}</span>
                   </div>
                   <div className="history-date">{new Date(e.date).toLocaleString()}</div>
